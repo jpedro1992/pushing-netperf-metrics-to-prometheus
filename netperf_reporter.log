@@ -1,0 +1,23 @@
+INFO:root:Namespace(file='results.csv')
+INFO:root:Reading csv file... Dataframe: 
+INFO:root:                                              origin  ... netperf_p99_latency_microseconds
+0  master.cluster.wall2-ilabt-iminds-be.wall1.ila...  ...                              378
+1  node4.testbed.wall2-ilabt-iminds-be.wall1.ilab...  ...                              413
+2  node3.testbed.wall2-ilabt-iminds-be.wall1.ilab...  ...                              411
+3  node2.testbed.wall2-ilabt-iminds-be.wall1.ilab...  ...                              413
+
+[4 rows x 5 columns]
+INFO:root:Retrieved '12' metrics
+INFO:root:Metric netperf_p50_latency_microseconds{origin="master_cluster_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node4_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 221
+INFO:root:Metric netperf_p90_latency_microseconds{origin="master_cluster_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node4_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 301
+INFO:root:Metric netperf_p99_latency_microseconds{origin="master_cluster_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node4_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 378
+INFO:root:Metric netperf_p50_latency_microseconds{origin="node4_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node2_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 302
+INFO:root:Metric netperf_p90_latency_microseconds{origin="node4_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node2_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 373
+INFO:root:Metric netperf_p99_latency_microseconds{origin="node4_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node2_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 413
+INFO:root:Metric netperf_p50_latency_microseconds{origin="node3_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node1_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 270
+INFO:root:Metric netperf_p90_latency_microseconds{origin="node3_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node1_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 349
+INFO:root:Metric netperf_p99_latency_microseconds{origin="node3_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node1_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 411
+INFO:root:Metric netperf_p50_latency_microseconds{origin="node2_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node3_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 271
+INFO:root:Metric netperf_p90_latency_microseconds{origin="node2_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node3_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 356
+INFO:root:Metric netperf_p99_latency_microseconds{origin="node2_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be", destination="node3_testbed_wall2-ilabt-iminds-be_wall1_ilabt_iminds_be"} has the value 413
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:9091
