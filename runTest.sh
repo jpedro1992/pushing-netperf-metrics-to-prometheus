@@ -17,7 +17,7 @@ while true;do
 	echo "Sleep set to $SLEEP seconds"
 
   echo "Run Perl script to measure the latency in the cluster..."
-	perl runNetperfV2.pl 2>>logNetperf.txt
+	perl runNetperf.pl 2>>logNetperf.txt # Or run runNetperfV2.pl ...
 
 	echo "Push Data to Prometheus PushGateway..."
 	python3 netperf_reporter.py --file results.csv
