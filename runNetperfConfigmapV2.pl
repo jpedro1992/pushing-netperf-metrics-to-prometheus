@@ -10,7 +10,7 @@
 ### sudo perl -MCPAN -e 'install JSON::Parse'   ###
 ###                                             ###
 ### If make was not OK (e.g. on cloud image),   ###
-### than you also need to install make by       ### 
+### than you also need to install make by       ###
 ### sudo apt install build-essentials           ###
 ###                                             ###
 ### Written by Megyo on 15. May 2018            ###
@@ -24,22 +24,21 @@ use strict;
 use warnings;
 
 # Open the CSV file
-my $csv = Text::CSV->new({ binary => 1, auto_diag => 2, eol => "\n"});
+#my $csv = Text::CSV->new({ binary => 1, auto_diag => 2, eol => "\n"});
+
+#$csv->column_names('origin', 'destination', 'netperf_p50_latency_microseconds','netperf_p90_latency_microseconds','netperf_p99_latency_microseconds');
+#open my $fh, ">", "results.csv" or die "Failed to open file: $!";
+
+# print csv header
+#$csv->print ($fh,['origin','destination','netperf_p50_latency_microseconds','netperf_p90_latency_microseconds','netperf_p99_latency_microseconds']);
 
 my $filename = 'netperfMetrics.txt';
 
-open(my $fhtxt, '>', $filename) or die "Could not open file '$filename' $!";
-
-# For csv
-$csv->column_names('origin', 'destination', 'netperf_p50_latency_microseconds','netperf_p90_latency_microseconds','netperf_p99_latency_microseconds');
-open my $fh, ">", "results.csv" or die "Failed to open file: $!";
-
-# print csv header
-$csv->print ($fh,['origin','destination','netperf_p50_latency_microseconds','netperf_p90_latency_microseconds','netperf_p99_latency_microseconds']);
+open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
 
 #maximum number of measurements in different types
 my $numberOfLocalhostMeasurements = 20;
-my $numberOfInterNodeMeasurements = 20;
+#my $numberOfInterNodeMeasurements = 20;
 my $iperfTime = 2;
 
 my $netperfRequestPacketSize = 32;
@@ -73,33 +72,37 @@ my %randHash = randomPodPairsOnSameNode($numberOfLocalhostMeasurements);
 #if only have one node, than exit
 exit if (scalar(keys %nodes) < 2);
 
-my @randArray = randomKeysFromHash($numberOfLocalhostMeasurements,%pods);
+#my @randArray = randomKeysFromHash($numberOfLocalhostMeasurements,%pods);
 
 #run Iperf between Nodes to see maximum internode capacity
-my %randNodePairs = randomNodePairs($numberOfInterNodeMeasurements);
+#my %randNodePairs = randomNodePairs($numberOfInterNodeMeasurements);
+#print %randNodePairs;
 
-foreach my $node (keys %randNodePairs) {
-	last if ($nobaseline);
-	my $podName = $nodes{$node}->{'HostNetPerf'};
-	my $targetIP = $nodes{$randNodePairs{$node}}->{'IPaddress'};
+foreach my $n1 (keys %nodes) {
+    foreach my $n2 (keys %nodes) {
+        last if ($nobaseline);
+		if ($n1 ne $n2) {
+			my $podName = $nodes{$n1}->{'HostNetPerf'};
+			my $targetIP = $nodes{$n2}->{'IPaddress'};
 
-	my $netperfRR = &runNetperf($podName, $targetIP, $iperfTime, 'TCP_RR', 'P50_LATENCY, P90_LATENCY,P99_LATENCY,THROUGHPUT,THROUGHPUT_UNITS');
-	print "InterNode NetPerf TCP_RR test between Node $node and Node $randNodePairs{$node} (latency 50, 90 and 99 percentiles in us and DB like transaction rate): $netperfRR\n";
-	
-	my ($sc1, $sc2, $sc3, $sc4) = split(',', $netperfRR, 4);
-	# displaying string after splitting
-	# print "$sc1\n$sc2\n$sc3\n$sc4";
-	
-	# print results to csv
-	$csv->print ($fh, [$node, $randNodePairs{$node}, $sc1, $sc2, $sc3]);
+			my $netperfRR = &runNetperf($podName, $targetIP, $iperfTime, 'TCP_RR', 'P50_LATENCY,P90_LATENCY,P99_LATENCY,THROUGHPUT,THROUGHPUT_UNITS');
+			print "InterNode NetPerf TCP_RR test between Node $n1 and Node $n2 (latency 50,90 and 99 percentiles in us and DB like transaction rate): $netperfRR\n";
 
-	print $fhtxt "netperf_p50_latency_microseconds.origin." + $node + ".destination." + $randNodePairs{$node} + "=" + $sc1 + "\n";
-	
-	#$csv->eol ("\r\n");	
+			my ($sc1, $sc2, $sc3, $sc4) = split(',', $netperfRR, 4);
+			# displaying string after splitting
+			# print "$sc1\n$sc2\n$sc3\n$sc4";
+
+			# handle and print results
+			#$csv->print($fh, [ $n1, $n2, $sc1, $sc2, $sc3 ]);
+
+			#print $fh "netperf_p50_latency_microseconds.origin.$n1.destination.$n2=$sc1\n";
+			print $fh "netperf_p90_latency_microseconds.origin.$n1.destination.$n2=$sc2\n";
+			#print $fh "netperf_p99_latency_microseconds.origin.$n1.destination.$n2=$sc23\n";
+		}
+    }
 }
 
 close $fh;
-close $fhtxt;
 
 sub runIperf {
 	my ($pod, $serverIP, $time) = @_;
@@ -162,23 +165,23 @@ sub runFortio {
 
 sub randomKeysFromHash {
     my $number = shift;
-    my %hash = @_; 
+    my %hash = @_;
     my @randomList = ();
-	
+
     while (($number > 0) and (scalar(keys %hash) > 0)) {
 		my $randKey = (keys %hash)[rand keys %hash];
 		push @randomList, $randKey;
 		delete $hash{$randKey};
 		$number--;
 	}
-	
+
     return @randomList;
 }
 
 sub randomPodPairsOnSameNode {
     my $number = shift;
-    my %hash = (); 
-    
+    my %hash = ();
+
     foreach my $node (keys %nodes) {
 		my @tmp = @{$nodes{$node}->{'pods'}};
 		while (($number > 0) and (scalar(@tmp) > 1)) {
@@ -188,18 +191,18 @@ sub randomPodPairsOnSameNode {
 			$number--;
 		}
 	}
-		
+
     return %hash;
 }
 
 sub randomNodePairs {
     my $number = shift;
-    my %hash = (); 
-    
+    my %hash = ();
+
 	my @tmp = keys %nodes;
-	
+
     return %hash if (scalar(@tmp) < 2);
-	
+
 	if (scalar(@tmp) == 2) {
 		$hash{$tmp[0]} = $tmp[1];
 		$hash{$tmp[1]} = $tmp[0];
@@ -213,7 +216,7 @@ sub randomNodePairs {
 		$hash{$tmp[0]} = $tmp[2];
 		return %hash;
 	}
-	
+
 	if (scalar(@tmp) == 4) {
 		$hash{$tmp[0]} = $tmp[1];
 		$hash{$tmp[0]} = $tmp[2];
@@ -228,7 +231,7 @@ sub randomNodePairs {
 		shift @tmp;
 		$number--;
 	}
-		
+
     return %hash;
 }
 
@@ -240,7 +243,7 @@ sub randomPodsOnDiffernetNodes {
 	foreach my $nodeA (keys %nodePairs) {
 		my @tmpA = @{$nodes{$nodeA}->{'pods'}};
 		my @tmpB = @{$nodes{$nodePairs{$nodeA}}->{'pods'}};
-		
+
 		my $podA = $tmpA[rand @tmpA];
 		my $podB = $tmpB[rand @tmpB];
 		$hash{$podA} = $podB;
@@ -256,14 +259,14 @@ sub getKubernetesInfo {
 	foreach (split("\n", $allNodes)) {
 		#this will be the temporary variable to store all relevant Node data
 		my %tmp = ();
-		
+
 		#add array for future POD information
 		my @podsOnThisNode = ();
 		$tmp{'pods'} = \@podsOnThisNode;
-			
+
 		$_ =~ s/node\///;
 		print STDERR "Node: $_\n";
-		
+
 		#get all the information on this particular Nodes
 		my $res = `kubectl describe node $_`;
 		foreach my $line (split("\n", $res)) {
@@ -271,12 +274,12 @@ sub getKubernetesInfo {
 			if ($line =~ /InternalIP:.*?($IPregexp)/) {
 				$tmp{'IPaddress'} = $1;
 			}
-			
-			#get PodCIDR of the Node 
+
+			#get PodCIDR of the Node
 			if ($line =~ /PodCIDR:.*?($IPregexp\/\d+)/) {
 				$tmp{'PodCIDR'} = $1;
 			}
-			
+
 		}
 		$nodes{$_} = \%tmp;
 	}
@@ -286,14 +289,14 @@ sub getKubernetesInfo {
 	my $allPods = `kubectl get pods -o=custom-columns=NAME:.metadata.name,NAMESPACE:.metadata.namespace | grep netperf`;
 	foreach (split("\n", $allPods)) {
 		#next if ($_ =~ /NAMESPACE/); #just skip the first header line
-		
+
 		#this will be the temporary variable to store all relevant POD data
 		my %tmp = ();
-		
+
 		my ($name, $namespace) = split(/ +/, $_);
 		print STDERR "Pod: $name  in  $namespace \n";
 		$tmp{'namespace'} = $namespace;
-		
+
 		#get all the information on this particular Nodes
 		my $res = `kubectl describe pod $name --namespace=$namespace`;
 		foreach my $line (split("\n", $res)) {
@@ -301,35 +304,35 @@ sub getKubernetesInfo {
 			if ($line =~ /IP:.*?($IPregexp)/) {
 				$tmp{'IPaddress'} = $1;
 			}
-			
+
 			#get the Node that the POD is running on
 			if ($line =~ /Node: +(.*?)\/($IPregexp)/) {
 				$tmp{'NodeName'} = $1;
-				$tmp{'NodeIP'} = $2;            
+				$tmp{'NodeIP'} = $2;
 			}
 		}
 		#if this POD runs in host mode, we add it to the node
 		if ($tmp{'IPaddress'} eq $tmp{'NodeIP'}) {
 			$nodes{$tmp{'NodeName'}}->{'HostNetPerf'} = $name;
-		}	
+		}
 		#adding the same POD to the Node's list and to the POD list
 		else {
 			push @{$nodes{$tmp{'NodeName'}}->{'pods'}}, $name;
 			$pods{$name} = \%tmp;
-		}	
-		
+		}
+
 	}
 
 	#get all info on NetPerf service
 	my $allServices = `kubectl get services --all-namespaces -o wide | grep netperf`;
 	foreach (split("\n", $allServices)) {
 		next if ($_ =~ /NAMESPACE/); #just skip the first header line
-		
+
 		#this will be the temporary variable to store all relevant POD data
 		my %tmp = ();
-		
+
 		my @podBackends = ();
-		
+
 		my ($namespace, $name, $type, $clusterIP, $externalIP, $port, $age, $selector) = split(/ +/, $_);
 		print STDERR "service: $name  in  $namespace IP=$clusterIP $externalIP $selector \n";
 		$tmp{'namespace'} = $namespace;
@@ -337,8 +340,8 @@ sub getKubernetesInfo {
 		$tmp{'clusterIP'} = $clusterIP;
 		$tmp{'externalIP'} = $externalIP;
 		$tmp{'selector'} = $selector;
-		
-		
+
+
 		#get all the POD backends for this service
 		my $res = `kubectl get pods -l $selector --all-namespaces -o name`;
 		foreach my $line (split("\n", $res)) {
@@ -346,7 +349,7 @@ sub getKubernetesInfo {
 			push @podBackends, $line;
 		}
 		$tmp{'podBackends'} = \@podBackends;
-			
+
 		$services{$name} = \%tmp;
 	}
 

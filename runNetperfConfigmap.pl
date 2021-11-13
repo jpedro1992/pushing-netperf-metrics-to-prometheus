@@ -24,18 +24,18 @@ use strict;
 use warnings;
 
 # Open the CSV file
-my $csv = Text::CSV->new({ binary => 1, auto_diag => 2, eol => "\n"});
+#my $csv = Text::CSV->new({ binary => 1, auto_diag => 2, eol => "\n"});
 
 my $filename = 'netperfMetrics.txt';
 
-open(my $fhtxt, '>', $filename) or die "Could not open file '$filename' $!";
+open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
 
 # For csv
-$csv->column_names('origin', 'destination', 'netperf_p50_latency_microseconds','netperf_p90_latency_microseconds','netperf_p99_latency_microseconds');
-open my $fh, ">", "results.csv" or die "Failed to open file: $!";
+#$csv->column_names('origin', 'destination', 'netperf_p50_latency_microseconds','netperf_p90_latency_microseconds','netperf_p99_latency_microseconds');
+#open my $fh, ">", "results.csv" or die "Failed to open file: $!";
 
 # print csv header
-$csv->print ($fh,['origin','destination','netperf_p50_latency_microseconds','netperf_p90_latency_microseconds','netperf_p99_latency_microseconds']);
+#$csv->print ($fh,['origin','destination','netperf_p50_latency_microseconds','netperf_p90_latency_microseconds','netperf_p99_latency_microseconds']);
 
 #maximum number of measurements in different types
 my $numberOfLocalhostMeasurements = 20;
@@ -87,19 +87,21 @@ foreach my $node (keys %randNodePairs) {
 	print "InterNode NetPerf TCP_RR test between Node $node and Node $randNodePairs{$node} (latency 50, 90 and 99 percentiles in us and DB like transaction rate): $netperfRR\n";
 	
 	my ($sc1, $sc2, $sc3, $sc4) = split(',', $netperfRR, 4);
+	
 	# displaying string after splitting
 	# print "$sc1\n$sc2\n$sc3\n$sc4";
 	
 	# print results to csv
-	$csv->print ($fh, [$node, $randNodePairs{$node}, $sc1, $sc2, $sc3]);
-
-	print $fhtxt "netperf_p50_latency_microseconds.origin." + $node + ".destination." + $randNodePairs{$node} + "=" + $sc1 + "\n";
+	#$csv->print ($fh, [$node, $randNodePairs{$node}, $sc1, $sc2, $sc3]);
+	 
+	#print $fh "netperf_p50_latency_microseconds.origin.$node.destination.$randNodePairs{$node}=$sc1\n";
+	print $fh "netperf_p90_latency_microseconds.origin.$node.destination.$randNodePairs{$node}=$sc2\n";
+	#print $fh "netperf_p99_latency_microseconds.origin.$node.destination.$randNodePairs{$node}=$sc3\n";
 	
 	#$csv->eol ("\r\n");	
 }
 
 close $fh;
-close $fhtxt;
 
 sub runIperf {
 	my ($pod, $serverIP, $time) = @_;
