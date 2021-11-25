@@ -24,7 +24,7 @@ do
 	perl runNetperfConfigmapV2.pl 2>>logNetperf.txt
 	
 	echo "Create configmap with results"
-	kubectl create configmap netperf-metrics --from-file="netperfMetrics.txt" --dry-run=client
+	kubectl create configmap netperf-metrics --from-env-file="netperfMetrics.txt" # --dry-run=client
 
   #echo "Sleep for $SLEEP seconds ... "
 	#sleep ${SLEEP}
