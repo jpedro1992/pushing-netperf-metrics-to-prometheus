@@ -2,9 +2,8 @@
 
 Repository for the netperf component used by the Diktyo framework for the Kubernetes platform.
 
-The goal is to perform netperf measurements between cluster nodes 
-in Kubernetes and have the values available as metrics in a [Configmap](https://kubernetes.io/docs/concepts/configuration/configmap/)  
-to make scheduling decisions based on latency.
+The goal is to perform netperf measurements between cluster nodes in Kubernetes and 
+store the values as metrics in a [Configmap](https://kubernetes.io/docs/concepts/configuration/configmap/) to make scheduling decisions based on latency.
 
 ## Netperf Component
 
