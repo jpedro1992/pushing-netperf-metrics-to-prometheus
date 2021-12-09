@@ -8,6 +8,7 @@
 # - PROMETHEUS_URL: pushGateway URL, example: https://localhost:9091/metrics/job/"some_job"/instance/"some_instance"
 # - PROMETHEUS_USR: username if needed
 # - PROMETHEUS_PSW: password if needed
+
 import argparse
 import logging
 import requests

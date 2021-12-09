@@ -1,0 +1,12 @@
+netperf.p90.latency.milliseconds.origin.n1.destination.n2=60
+netperf.p90.latency.milliseconds.origin.n1.destination.n3=109
+netperf.p90.latency.milliseconds.origin.n1.destination.n4=30
+netperf.p90.latency.milliseconds.origin.n2.destination.n1=60
+netperf.p90.latency.milliseconds.origin.n2.destination.n2=109
+netperf.p90.latency.milliseconds.origin.n2.destination.n3=10
+netperf.p90.latency.milliseconds.origin.n3.destination.n1=60
+netperf.p90.latency.milliseconds.origin.n3.destination.n2=70
+netperf.p90.latency.milliseconds.origin.n3.destination.n4=60
+netperf.p90.latency.milliseconds.origin.n4.destination.n1=60
+netperf.p90.latency.milliseconds.origin.n4.destination.n2=40
+netperf.p90.latency.milliseconds.origin.n4.destination.n3=60
